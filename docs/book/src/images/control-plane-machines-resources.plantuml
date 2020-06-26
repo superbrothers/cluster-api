@@ -1,0 +1,44 @@
+@startuml control-plane-machines-resources
+
+skinparam object {
+    backgroundColor<< Infrastructure provider CRD >> #D9EAD3
+}
+
+' Cluster API CRD
+object Cluster << Cluster API CRD >> {
+    <font color="Green">spec.infrastructureRef</font>
+    spec.controlPlaneRef
+}
+
+object MachineHealthCheck << Cluster API CRD >> {
+    spec.clusterName
+}
+
+object KubeadmControlPlane << Cluster API CRD >> {
+    <font color="Green">spec.infrastructureTemplate</font>
+    spec.kubeadmConfigSpec
+}
+
+object Machine << Cluster API CRD >> {
+    <font color="Green">spec.infrastructureRef</font>
+    spec.bootstrap.configRef
+}
+
+object KubeadmConfig << Cluster API CRD >> 
+
+' Infrastructure provider CRD
+object FooCluster << Infrastructure provider CRD >>
+object FooMachineTemplate << Infrastructure provider CRD >>
+object FooMachine << Infrastructure provider CRD >>
+
+MachineHealthCheck "0..*" .right.>  "1" Cluster
+Cluster ..> KubeadmControlPlane
+Cluster ..> FooCluster
+KubeadmControlPlane .left.> FooMachineTemplate
+KubeadmControlPlane "1" --> "1..*" Machine
+KubeadmControlPlane "1" --> "1" KubeadmConfig
+KubeadmControlPlane "1" --> "1..*" FooMachine
+Machine ..> KubeadmConfig
+Machine ..> FooMachine
+
+@endurl

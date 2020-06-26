@@ -1,0 +1,46 @@
+@startuml worker-machines-resources
+
+skinparam object {
+    backgroundColor<< Infrastructure provider CRD >> #D9EAD3
+}
+
+' Cluster API CRD
+object Cluster << Cluster API CRD >>
+
+object MachineDeployment << Cluster API CRD >> {
+    spec.clusterName
+    <font color="Green">spec.template.spec.infrastructureRef</font>
+    spec.template.spec.bootstrap.configRef
+}
+
+object KubeadmConfigTemplate << Cluster API CRD >>
+
+object MachineSet << Cluster API CRD >> {
+    <font color="Green">spec.template.spec.infrastructureRef</font>
+    spec.template.spec.bootstrap.configRef
+}
+
+object Machine << Cluster API CRD >> {
+    <font color="Green">spec.infrastructureRef</font>
+    spec.bootstrap.configRef
+}
+
+object KubeadmConfig << Cluster API CRD >> 
+
+' Infrastructure provider CRD
+object FooMachineTemplate << Infrastructure provider CRD >>
+object FooMachine << Infrastructure provider CRD >>
+
+MachineDeployment "1..*" .right.> "1" Cluster
+MachineDeployment ..> FooMachineTemplate
+MachineDeployment "1" --> "1..*" MachineSet
+MachineDeployment ..> KubeadmConfigTemplate
+MachineSet .left.> FooMachineTemplate
+MachineSet .right.> KubeadmConfigTemplate
+MachineSet "1" --> "1..*" Machine
+MachineSet "1" --> "1..*" FooMachine
+MachineSet "1" --> "1" KubeadmConfig
+Machine ..> FooMachine
+Machine ..> KubeadmConfig
+
+@endurl
