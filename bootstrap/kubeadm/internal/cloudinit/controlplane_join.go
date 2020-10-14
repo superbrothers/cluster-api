@@ -24,12 +24,18 @@ import (
 const (
 	controlPlaneJoinCloudInit = `{{.Header}}
 {{template "files" .WriteFiles}}
+-   path: /run/env.sh
+    owner: root:root
+    permissions: 0600
+    content: |
+      CONTROLPLANE_JOIN=1
 -   path: /tmp/kubeadm-join-config.yaml
     owner: root:root
     permissions: '0640'
     content: |
 {{.JoinConfiguration | Indent 6}}
 runcmd:
+  - source /run/env.sh
 {{- template "commands" .PreKubeadmCommands }}
   - {{ .KubeadmCommand }}
 {{- template "commands" .PostKubeadmCommands }}
